@@ -1,0 +1,162 @@
+menu "CLOCKS GPIO SETTINGS"
+  config ENV_GPIO_RANGE_MIN
+    int
+    default 0
+
+  config ENV_GPIO_RANGE_MAX
+    int
+    default 48
+
+  config LED_GPIO
+    int "Onboard LED GPIO number"
+    range ENV_GPIO_RANGE_MIN ENV_GPIO_RANGE_MAX
+    default 2 if IDF_TARGET_ESP32
+    default 8 if IDF_TARGET_ESP32C3
+    default 48 if IDF_TARGET_ESP32S3
+    default 5
+    help
+      GPIO number (IOxx) for the onboard LED.
+
+  config SDA_PIN
+    int "SDA GPIO number"
+    range ENV_GPIO_RANGE_MIN ENV_GPIO_RANGE_MAX
+    default 21 if IDF_TARGET_ESP32
+    default 7 if IDF_TARGET_ESP32C3
+    default 21
+    help
+      GPIO number (IOxx) for the IC2 SDA pin.
+      Check the pins schematics of you board to find it.
+
+  config SCL_PIN
+    int "SCL GPIO number"
+    range ENV_GPIO_RANGE_MIN ENV_GPIO_RANGE_MAX
+    default 22 if IDF_TARGET_ESP32
+    default 6 if IDF_TARGET_ESP32C3
+    default 22
+    help
+      GPIO number (IOxx) for the IC2 SCL pin.
+      Check the pins schematics of you board to find it.
+
+  config TM1637_CLK_PIN
+    int "TM1637 LCD screen CLK GPIO number"
+    range 0 ENV_GPIO_RANGE_MAX
+    default 33 if IDF_TARGET_ESP32
+    default 0 if IDF_TARGET_ESP32C3
+    default 33
+    help
+        GPIO number (IOxx) for CLK pin of TM1637 display.
+
+  config TM1637_DIO_PIN
+    int "TM1637 LCD screen DIO pin GPIO number"
+    range 0 ENV_GPIO_RANGE_MAX
+    default 32 if IDF_TARGET_ESP32
+    default 1 if IDF_TARGET_ESP32C3
+    default 32
+    help
+        GPIO number (IOxx) for DIO pin of TM1637 display.
+
+  config LIGHT_SENSOR_PIN
+    int "HW-072 light sensor Data Output (DO) pin GPIO number"
+    range 0 ENV_GPIO_RANGE_MAX
+    default 34 if IDF_TARGET_ESP32
+    default 3 if IDF_TARGET_ESP32C3
+    default 34
+    help
+        GPIO number (IOxx) for Data Output (DO) pin of HW-072 light sensor.
+        Input only ports can be also used as the sensor is only outputing the data.
+endmenu
+
+menu "CLOCKS WI-FI SETTINGS"
+  config WIFI_SSID
+    string "Wi-Fi SSID"
+    default "myssid"
+    help
+        SSID (network name) for the example to connect to.
+
+  config WIFI_PASSWORD
+    string "Wi-Fi Password"
+    default "mypassword"
+    help
+      Wi-Fi password (WPA or WPA2) for the example to use.
+
+  choice WIFI_SAE_MODE
+    prompt "WPA3 SAE mode selection"
+    default WIFI_WPA3_SAE_PWE_BOTH
+    help
+      Select mode for SAE as Hunt and Peck, H2E or both.
+    config WIFI_WPA3_SAE_PWE_HUNT_AND_PECK
+      bool "HUNT AND PECK"
+    config WIFI_WPA3_SAE_PWE_HASH_TO_ELEMENT
+      bool "H2E"
+    config WIFI_WPA3_SAE_PWE_BOTH
+      bool "BOTH"
+  endchoice
+
+  config WIFI_PW_ID
+    string "PASSWORD IDENTIFIER"
+    depends on WIFI_WPA3_SAE_PWE_HASH_TO_ELEMENT|| WIFI_WPA3_SAE_PWE_BOTH
+    default ""
+    help
+      password identifier for SAE H2E
+
+  config WIFI_MAXIMUM_RETRY
+    int "Maximum retry"
+    default 5
+    help
+      Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
+
+  choice WIFI_SCAN_AUTH_MODE_THRESHOLD
+    prompt "WiFi Scan auth mode threshold"
+    default WIFI_AUTH_WPA2_PSK
+    help
+      The weakest authmode to accept in the scan mode.
+      This value defaults to WIFI_AUTH_WPA2_PSK incase password is present and WIFI_AUTH_OPEN is used.
+      Please select WIFI_AUTH_WEP/WIFI_AUTH_WPA_PSK incase AP is operating in WEP/WPA mode.
+
+    config WIFI_AUTH_OPEN
+      bool "OPEN"
+    config WIFI_AUTH_WEP
+      bool "WEP"
+    config WIFI_AUTH_WPA_PSK
+      bool "WPA PSK"
+    config WIFI_AUTH_WPA2_PSK
+      bool "WPA2 PSK"
+    config WIFI_AUTH_WPA_WPA2_PSK
+      bool "WPA/WPA2 PSK"
+    config WIFI_AUTH_WPA3_PSK
+      bool "WPA3 PSK"
+    config WIFI_AUTH_WPA2_WPA3_PSK
+      bool "WPA2/WPA3 PSK"
+    config WIFI_AUTH_WAPI_PSK
+      bool "WAPI PSK"
+  endchoice
+endmenu
+
+menu "CLOCKS TIMEZONE SETTINGS"
+  config TIMEZONE
+    string "Timezone"
+    default "CET-1CEST,M3.5.0,M10.5.0/3"
+    help
+      https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/system_time.html?highlight=timezone#timezones (Default is Amsterdam)
+endmenu
+
+menu "CLOCKS WEATHER API SETTINGS"
+  config WEATHER_API_KEY
+    string "Weather API key (weatherapi.com)"
+    help
+      Go to https://www.weatherapi.com and check your key
+
+  config WEATHER_CITY
+    string "Weather City"
+    help
+      City to get the current weather.
+    default "Amsterdam"
+endmenu
+
+menu "CLOCKS OTA UPDATE SETTINGS"
+  config FIRMWARE_UPGRADE_URL
+    string "Firmware upgrade endpoint URL"
+    default "https://192.168.50.100:8070/clocks.bin"
+    help
+      URL of server which hosts the firmware image.
+endmenu
